@@ -12,7 +12,8 @@ namespace ConsoleApiSW
 
         static HttpClient client = new HttpClient();
 
-        static void ShowProduct(string content)
+        // Show content
+        static void ShowContent(string content)
         {
             Console.WriteLine(content);
         }
@@ -31,7 +32,7 @@ namespace ConsoleApiSW
             try
             {
                var content = await client.GetStringAsync("https://swapi.dev/api/planets/4/");
-               ShowProduct(content);
+                ShowContent(content);
             }
             catch (Exception e)
             {
