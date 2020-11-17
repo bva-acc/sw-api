@@ -26,32 +26,37 @@ namespace ConsoleApiSW
         }
         static async Task RunAsync()
         {
-            //client.BaseAddress = new Uri("https://swapi.dev/api/planets/");
-            //httpClient.DefaultRequestHeaders.Accept.Clear();
-            //httpClient.DefaultRequestHeaders.Accept.Add(
-            //    new MediaTypeWithQualityHeaderValue("application/json"));
-            string request = "https://swapi.co/api/planets/?page=";
+            string request = "https://swapi.dev/api/planets/?page=";
+            
+            dynamic data;
+            bool next = true;
             int pageNumber = 1;
-            string url = request + pageNumber.ToString();
-            Console.WriteLine(url);
+            
             try
             {
                 ArrayList planetList = new ArrayList();
                 do {
+                    string url = request + pageNumber.ToString();
 
                     HttpResponseMessage response = (await httpClient.GetAsync(url)).EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    dynamic data = JsonConvert.DeserializeObject(responseBody);
-                    Console.WriteLine(data);
+                    data = JsonConvert.DeserializeObject(responseBody);
 
-                    foreach (int i in data.results)
+                    foreach (var i in data.results)
                     {
-                        planetList.Add(data.results[i].name);
-                        Console.WriteLine(data.results[i].name);
+                        planetList.Add(i.name);
                     }
-                } while (false);
-                
-                    
+                    pageNumber++;
+                    Newtonsoft.Json.Linq.JToken token = data["next"];
+                    if (token.Type == Newtonsoft.Json.Linq.JTokenType.Null) {
+                        next = false;
+                    }
+                } while (next);
+
+                foreach (object o in planetList)
+                {
+                    Console.WriteLine(o);
+                }
                 // ShowContent(content);
             }
             catch (Exception e)
