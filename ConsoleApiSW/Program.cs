@@ -5,6 +5,10 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Collections;
 using Newtonsoft.Json;
+using System.Data.SqlClient;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleApiSW
 {
@@ -22,7 +26,27 @@ namespace ConsoleApiSW
 
         static void Main()
         {
-            RunAsync().GetAwaiter().GetResult();
+
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                Planet planet1 = new Planet { Name = "PlanetName1"};
+                Planet planet2 = new Planet { Name = "PlanetName1" };
+
+                db.Planets.Add(planet1);
+                db.Planets.Add(planet2);
+                db.SaveChanges();
+                Console.WriteLine("Objects saved successfully");
+
+                var users = db.Planets.ToList();
+                Console.WriteLine("List of objects:");
+                foreach (Planet u in users)
+                {
+                    Console.WriteLine($"{u.Id}.{u.Name}");
+                }
+            }
+            Console.Read();
+
+        RunAsync().GetAwaiter().GetResult();
         }
         static async Task RunAsync()
         {
@@ -31,7 +55,7 @@ namespace ConsoleApiSW
             dynamic data;
             bool next = true;
             int pageNumber = 1;
-            
+
             try
             {
                 ArrayList planetList = new ArrayList();
