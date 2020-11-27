@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleApiSW
 {
-   
+
     class Program
     {
 
@@ -26,32 +26,12 @@ namespace ConsoleApiSW
 
         static void Main()
         {
-
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                Planet planet1 = new Planet { Name = "PlanetName1" };
-                Planet planet2 = new Planet { Name = "PlanetName1" };
-
-                db.Planets.Add(planet1);
-                db.Planets.Add(planet2);
-                db.SaveChanges();
-                Console.WriteLine("Objects saved successfully");
-
-                var users = db.Planets.ToList();
-                Console.WriteLine("List of objects:");
-                foreach (Planet u in users)
-                {
-                    Console.WriteLine($"{u.Id}.{u.Name}");
-                }
-            }
-            Console.Read();
-
-        RunAsync().GetAwaiter().GetResult();
+            RunAsync().GetAwaiter().GetResult();
         }
         static async Task RunAsync()
         {
             string request = "https://swapi.dev/api/planets/?page=";
-            
+
             dynamic data;
             bool next = true;
             int pageNumber = 1;
@@ -59,7 +39,8 @@ namespace ConsoleApiSW
             try
             {
                 ArrayList planetList = new ArrayList();
-                do {
+                do
+                {
                     string url = request + pageNumber.ToString();
 
                     HttpResponseMessage response = (await httpClient.GetAsync(url)).EnsureSuccessStatusCode();
@@ -68,19 +49,41 @@ namespace ConsoleApiSW
 
                     foreach (var i in data.results)
                     {
-                        planetList.Add(i.name);
+                        planetList.Add(new Planet { Name = i.name, Population = i.population == "unknown" ? 0 : i.population });
                     }
                     pageNumber++;
                     Newtonsoft.Json.Linq.JToken token = data["next"];
-                    if (token.Type == Newtonsoft.Json.Linq.JTokenType.Null) {
+                    if (token.Type == Newtonsoft.Json.Linq.JTokenType.Null)
+                    {
                         next = false;
                     }
                 } while (next);
 
-                foreach (object o in planetList)
+                using (ApplicationContext db = new ApplicationContext())
                 {
-                    Console.WriteLine(o);
+                    var rows = from o in db.Planets select o;
+                    foreach (var row in rows)
+                    {
+                        db.Planets.Remove(row);
+                    }
+                    db.SaveChanges();
+
+                    foreach (Planet o in planetList)
+                    {
+                        db.Planets.Add(o);
+                    }
+
+                    db.SaveChanges();
+                    Console.WriteLine("Objects saved successfully");
+
+                    var planets = db.Planets.ToList();
+                    Console.WriteLine("List of objects:");
+                    foreach (Planet p in planets)
+                    {
+                        Console.WriteLine($"{p.Name} - {p.Population}");
+                    }
                 }
+
                 // ShowContent(content);
             }
             catch (Exception e)
