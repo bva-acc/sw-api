@@ -8,8 +8,8 @@ namespace ConsoleApiSW
         public DbSet<Planet> Planets { get; set; }
         public ApplicationContext()
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

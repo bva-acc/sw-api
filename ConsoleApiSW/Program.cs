@@ -29,7 +29,7 @@ namespace ConsoleApiSW
 
             using (ApplicationContext db = new ApplicationContext())
             {
-                Planet planet1 = new Planet { Name = "PlanetName1"};
+                Planet planet1 = new Planet { Name = "PlanetName1" };
                 Planet planet2 = new Planet { Name = "PlanetName1" };
 
                 db.Planets.Add(planet1);
