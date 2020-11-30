@@ -76,12 +76,15 @@ namespace ConsoleApiSW
                     db.SaveChanges();
                     Console.WriteLine("Objects saved successfully");
 
-                    var planets = db.Planets.ToList();
+                    var planets = db.Planets.OrderBy(p => p.Name).ToList();
                     Console.WriteLine("List of objects:");
                     foreach (Planet p in planets)
                     {
                         Console.WriteLine($"{p.Name} - {p.Population}");
                     }
+                    int inhabited = db.Planets.Count(p => p.Population != 0);
+                    Console.WriteLine($"Total inhabited planets: {inhabited}");
+
                 }
 
                 // ShowContent(content);
